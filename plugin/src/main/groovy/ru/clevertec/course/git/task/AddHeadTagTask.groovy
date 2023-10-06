@@ -7,7 +7,7 @@ import ru.clevertec.course.git.model.VersionType
 import ru.clevertec.course.git.service.GitServiceImpl
 
 class AddHeadTagTask extends AbstractResultedTask {
-    private GitServiceImpl service = GitServiceImpl.getInstance(project);
+    private GitServiceImpl service = GitServiceImpl.getInstance(project)
 
     @Input
     abstract Set<String> devAndQABranches
@@ -35,7 +35,7 @@ class AddHeadTagTask extends AbstractResultedTask {
         return type
     }
 
-    public TagVersion calculateCurrentVersion(){
+    TagVersion calculateCurrentVersion(){
         TagVersion lastVersion = service.findLastVersion()
         String curBranch = service.getBranch()
         VersionType type = IdentifyBranchType(curBranch)

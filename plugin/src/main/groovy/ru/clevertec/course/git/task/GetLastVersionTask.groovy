@@ -7,7 +7,7 @@ import ru.clevertec.course.git.service.GitServiceImpl
 class GetLastVersionTask extends DefaultTask{
     @TaskAction
     def lastVersionTask() {
-        def v = GitServiceImpl.getInstance(project).findLastVersion();
+        def v = GitServiceImpl.getInstance(project).findLastVersion()
         logger.quiet(v.toString())
         return v
 

@@ -12,7 +12,7 @@ class ComplexTagTask extends DefaultTask {
     @Input
     abstract String remoteName
 
-    private GitServiceImpl service = GitServiceImpl.getInstance(project);
+    private GitServiceImpl service = GitServiceImpl.getInstance(project)
 
     @TaskAction
     def tagCommit() {
@@ -20,7 +20,7 @@ class ComplexTagTask extends DefaultTask {
         if (service.hasUncommittedChanges()) {
             logger.quiet("{}.uncommitted", lastVersion)
         } else if (!service.headHasTag()) {
-            def addTask = (AddHeadTagTask) project.tasks.findByName(GitPlugin.ADD_TAG_TASK);
+            def addTask = (AddHeadTagTask) project.tasks.findByName(GitPlugin.ADD_TAG_TASK)
             service.addTagVersion(addTask.calculateCurrentVersion())
             service.pushToRemote(remoteName)
         }

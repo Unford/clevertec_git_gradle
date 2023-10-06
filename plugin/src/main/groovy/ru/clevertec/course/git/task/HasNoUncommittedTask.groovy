@@ -5,7 +5,7 @@ import org.gradle.api.tasks.TaskAction
 import ru.clevertec.course.git.service.GitServiceImpl
 
 class HasNoUncommittedTask extends AbstractResultedTask {
-    private GitServiceImpl service = GitServiceImpl.getInstance(project);
+    private GitServiceImpl service = GitServiceImpl.getInstance(project)
 
     @TaskAction
     def hasNoUncommittedChanges() {
