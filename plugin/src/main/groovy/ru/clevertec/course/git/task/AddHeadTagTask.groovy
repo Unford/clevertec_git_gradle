@@ -4,10 +4,8 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import ru.clevertec.course.git.model.TagVersion
 import ru.clevertec.course.git.model.VersionType
-import ru.clevertec.course.git.service.GitServiceImpl
 
 class AddHeadTagTask extends AbstractResultedTask {
-    private GitServiceImpl service = GitServiceImpl.getInstance(project)
 
     @Input
     abstract Set<String> devAndQABranches

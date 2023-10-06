@@ -14,28 +14,21 @@ import ru.clevertec.course.git.model.VersionType
 
 class GitServiceImpl implements GitService {
     private static final String PUSH_COMMAND = "git push %s head"
-    private static GitServiceImpl instance
-
-    Git git;
-    Logger logger;
+    Git git
+    Logger logger
 
 
-    private GitServiceImpl(Project project, Logger logger) {
+    GitServiceImpl(Project project) {
         FileRepositoryBuilder builder = new FileRepositoryBuilder()
         this.git = new Git(builder
                 .setWorkTree(project.getProjectDir())
                 .readEnvironment()
                 .findGitDir()
                 .build())
-        this.logger = logger
+        this.logger = project.logger
     }
 
-    static GitServiceImpl getInstance(Project project) {
-        if (instance == null) {
-            instance = new GitServiceImpl(project, project.logger)
-        }
-        return instance
-    }
+
 
 
     @Override
@@ -46,7 +39,7 @@ class GitServiceImpl implements GitService {
     @Override
     boolean headHasTag() {
         ObjectId headId = git.getRepository().resolve(Constants.HEAD)
-        List<Ref> tags = git.tagList().setContains(headId).call();
+        List<Ref> tags = git.tagList().setContains(headId).call()
 
         logger.info("Commit has tag - {}", !tags.isEmpty())
         return !tags.isEmpty()
@@ -57,17 +50,17 @@ class GitServiceImpl implements GitService {
         try {
             git.tag().setName(tagVersion.toString()).call()
             logger.quiet("Tag {} added successfully", tagVersion)
-            return true;
+            return true
         } catch (GitAPIException e) {
             logger.error(e.toString())
-            return false;
+            return false
         }
     }
 
     @Override
     boolean pushToRemote(String remote) {
         Process process = (PUSH_COMMAND.formatted(remote)).execute()
-        return process.waitFor() == 0;
+        return process.waitFor() == 0
     }
 
     @Override
@@ -91,6 +84,11 @@ class GitServiceImpl implements GitService {
 
     @Override
     String getBranch() {
-        return git.getRepository().getBranch();
+        return git.getRepository().getBranch()
+    }
+
+    @Override
+    boolean checkGitRepository() {
+        return git.getRepository().getObjectDatabase().exists()
     }
 }

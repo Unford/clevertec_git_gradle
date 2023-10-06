@@ -12,7 +12,7 @@ class ComplexTagTask extends DefaultTask {
     @Input
     abstract String remoteName
 
-    private GitServiceImpl service = GitServiceImpl.getInstance(project)
+    private GitServiceImpl service = new GitServiceImpl(project)
 
     @TaskAction
     def tagCommit() {

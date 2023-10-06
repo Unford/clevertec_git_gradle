@@ -10,4 +10,5 @@ interface GitService {
     TagVersion findLastVersion()
     String getBranch()
 
+    boolean checkGitRepository()
 }

@@ -6,7 +6,7 @@ import org.gradle.api.tasks.TaskAction
 import ru.clevertec.course.git.service.GitServiceImpl
 
 class PushHeadTask extends DefaultTask {
-    private GitServiceImpl service = GitServiceImpl.getInstance(project);
+    private GitServiceImpl service = new GitServiceImpl(project)
 
     @Input
     abstract String remote

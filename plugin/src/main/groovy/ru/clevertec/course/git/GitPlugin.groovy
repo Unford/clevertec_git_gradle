@@ -3,7 +3,6 @@ package ru.clevertec.course.git
 import org.eclipse.jgit.lib.Constants
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaBasePlugin
 import ru.clevertec.course.git.model.GitExtension
 import ru.clevertec.course.git.task.*
 
@@ -22,6 +21,7 @@ class GitPlugin implements Plugin<Project> {
    public static final String ADD_TAG_TASK = 'addTagToHead'
    public static final String PUSH_HEAD_TASK = 'pushHeadToRemote'
    public static final String GET_LAST_VERSION_TASK = 'getLastTagVersion'
+    public static final String IS_GIT_REPOSITORY_EXIST_TASK = 'isGitRepositoryExist'
 
 
     @Override
@@ -32,15 +32,21 @@ class GitPlugin implements Plugin<Project> {
         project.tasks.register(BUILD_TAGGER_NAME, ComplexTagTask) {
             remoteName = extension.getRemoteName().get()
             setGroup(PLUGIN_GROUP)
+            dependsOn(IS_GIT_REPOSITORY_EXIST_TASK)
         }
 
         project.tasks.register(GET_LAST_VERSION_TASK, GetLastVersionTask) {
+            setGroup(PLUGIN_GROUP)
+            dependsOn(IS_GIT_REPOSITORY_EXIST_TASK)
+        }
+        project.tasks.register(IS_GIT_REPOSITORY_EXIST_TASK, IsGitRepositoryExistTask) {
             setGroup(PLUGIN_GROUP)
         }
 
         def uncommittedTask = project.tasks.register(CHECK_UNCOMMITTED_TASK,
                 HasNoUncommittedTask) {
             setGroup(PLUGIN_GROUP)
+            dependsOn(IS_GIT_REPOSITORY_EXIST_TASK)
         }
 
         def headTagsTask = project.tasks.register(CHECK_HEAD_TAGS_TASK, HeadHasTagTask) {
