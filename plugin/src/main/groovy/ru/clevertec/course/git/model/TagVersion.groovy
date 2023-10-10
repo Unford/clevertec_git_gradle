@@ -1,43 +1,49 @@
 package ru.clevertec.course.git.model
 
-import java.math.RoundingMode
+
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 final class TagVersion {
     private final static String VERSION_PATTERN = "^v(\\d+\\.\\d+)(%s|%s)?\$"
-            .formatted(VersionType.STAGE.getPostfix(), VersionType.OTHER.getPostfix());
+            .formatted(VersionType.STAGE.getPostfix(), VersionType.OTHER.getPostfix())
+    public final static TagVersion ZERO_VERSION = new TagVersion(0, 0, VersionType.MASTER)
 
-    final BigDecimal version
+    final int majorVersion
+    final int minorVersion
+
     final VersionType versionType
 
-    TagVersion(BigDecimal version, VersionType versionType) {
-        this.version = version
+    TagVersion(int majorVersion, int minorVersion, VersionType versionType) {
+        this.majorVersion = majorVersion
+        this.minorVersion = minorVersion
         this.versionType = versionType
     }
 
-    BigDecimal getVersion() {
-        return version
+    int getMajorVersion() {
+        return majorVersion
+    }
+
+    int getMinorVersion() {
+        return minorVersion
     }
 
     VersionType getVersionType() {
         return versionType
     }
 
-    BigDecimal incrementMajorVersion() {
-        BigDecimal integerPart = version.setScale(0, RoundingMode.DOWN)
-        integerPart = integerPart.add(BigDecimal.ONE)
-        return integerPart.setScale(version.scale(), RoundingMode.DOWN)
+    TagVersion incrementMajorVersion() {
+        return new TagVersion(majorVersion + 1, minorVersion, versionType)
     }
 
-    BigDecimal incrementMinorVersion() {
-        return version.add(BigDecimal.valueOf(0.1))
+    TagVersion incrementMinorVersion() {
+        return new TagVersion(majorVersion, minorVersion + 1, versionType)
     }
 
     @Override
     String toString() {
         final StringBuilder sb = new StringBuilder("v")
-        sb.append(version)
+        sb.append(majorVersion).append('.').append(minorVersion)
         sb.append(versionType.getPostfix())
         return sb.toString()
     }
@@ -47,10 +53,11 @@ final class TagVersion {
         Pattern pattern = Pattern.compile(VERSION_PATTERN)
         Matcher matcher = pattern.matcher(str)
         if (matcher.matches()) {
-            String versionNumber = matcher.group(1)
+            String[] versionNumber = matcher.group(1).split("\\.")
             String postfix = matcher.group(2)
+            int majorV = Integer.parseInt(versionNumber[0])
+            int minorV = Integer.parseInt(versionNumber[1])
 
-            BigDecimal v = new BigDecimal(versionNumber)
             VersionType type = VersionType.DEV_OR_QA
             if (postfix != null) {
                 switch (postfix) {
@@ -64,11 +71,11 @@ final class TagVersion {
                     }
                 }
 
-            } else if (v.subtract(v.setScale(0, RoundingMode.DOWN)) == BigDecimal.ZERO) {
+            } else if (minorV == 0) {
                 type = VersionType.MASTER
             }
 
-            return Optional.of(new TagVersion(v, type))
+            return Optional.of(new TagVersion(majorV, minorV, type))
         }
         return Optional.empty()
     }
@@ -79,7 +86,8 @@ final class TagVersion {
 
         TagVersion that = (TagVersion) o
 
-        if (version != that.version) return false
+        if (majorVersion != that.majorVersion) return false
+        if (minorVersion != that.minorVersion) return false
         if (versionType != that.versionType) return false
 
         return true
@@ -87,7 +95,8 @@ final class TagVersion {
 
     int hashCode() {
         int result
-        result = (version != null ? version.hashCode() : 0)
+        result = majorVersion
+        result = 31 * result + minorVersion
         result = 31 * result + (versionType != null ? versionType.hashCode() : 0)
         return result
     }

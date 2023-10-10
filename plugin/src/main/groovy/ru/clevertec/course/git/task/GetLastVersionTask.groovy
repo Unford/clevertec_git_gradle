@@ -10,7 +10,7 @@ class GetLastVersionTask extends DefaultTask{
     @TaskAction
     def lastVersionTask() {
         def v = service.findLastVersion()
-        logger.quiet(v.toString())
+        logger.info(v.toString())
         return v
 
     }

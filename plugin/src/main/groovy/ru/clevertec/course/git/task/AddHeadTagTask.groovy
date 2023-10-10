@@ -37,13 +37,13 @@ class AddHeadTagTask extends AbstractResultedTask {
         TagVersion lastVersion = service.findLastVersion()
         String curBranch = service.getBranch()
         VersionType type = IdentifyBranchType(curBranch)
-        BigDecimal version = BigDecimal.valueOf(0.0)
+        TagVersion version = TagVersion.ZERO_VERSION
         logger.info("branch type - {}", type)
         if (type == VersionType.DEV_OR_QA || type == VersionType.STAGE || type == VersionType.OTHER) {
             version = lastVersion.incrementMinorVersion()
         } else if (type == VersionType.MASTER) {
             version = lastVersion.incrementMajorVersion()
         }
-        return new TagVersion(version, type)
+        return new TagVersion(version.majorVersion, version.minorVersion, type)
     }
 }

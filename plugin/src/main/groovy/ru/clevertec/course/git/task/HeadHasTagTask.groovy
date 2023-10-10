@@ -9,7 +9,6 @@ class HeadHasTagTask extends AbstractResultedTask {
     @TaskAction
     def headHasTag() {
         boolean hasTag = service.headHasTag()
-        logger.info(hasTag.toString())
         addResult(hasTag)
     }
 

@@ -9,11 +9,11 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import ru.clevertec.course.git.model.TagVersion
-import ru.clevertec.course.git.model.VersionType
 
+import java.util.stream.Collectors
 
 class GitServiceImpl implements GitService {
-    private static final String PUSH_COMMAND = "git push %s head"
+    private static final String PUSH_COMMAND = "git push %s head --follow-tags"
     Git git
     Logger logger
 
@@ -27,8 +27,6 @@ class GitServiceImpl implements GitService {
                 .build())
         this.logger = project.logger
     }
-
-
 
 
     @Override
@@ -47,20 +45,37 @@ class GitServiceImpl implements GitService {
 
     @Override
     boolean addTagVersion(TagVersion tagVersion) {
+        boolean res = false
         try {
             git.tag().setName(tagVersion.toString()).call()
-            logger.quiet("Tag {} added successfully", tagVersion)
-            return true
+            logger.info("Tag {} added successfully", tagVersion)
+            res = true
         } catch (GitAPIException e) {
-            logger.error(e.toString())
-            return false
+            logger.error(e.getMessage())
         }
+        return res
     }
 
     @Override
     boolean pushToRemote(String remote) {
-        Process process = (PUSH_COMMAND.formatted(remote)).execute()
-        return process.waitFor() == 0
+        boolean res = false
+        try {
+            Process process = (PUSH_COMMAND.formatted(remote)).execute()
+            res = process.waitFor() == 0
+            if (res) {
+                logger.info("Pushed tag to remote {}", remote)
+            } else {
+                logger.warn("Error during pushing command - {}", process
+                        .errorReader()
+                        .lines()
+                        .filter { !it.isBlank() }
+                        .collect(Collectors.joining("; ")))
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage())
+        }
+
+        return res
     }
 
     @Override
@@ -72,14 +87,12 @@ class GitServiceImpl implements GitService {
                     return tag
                 }
                 .sort { a, b ->
-                    (a.getVersion() <=> b.getVersion())
+                    Comparator.comparingInt({ TagVersion tag -> tag.getMajorVersion() })
+                            .thenComparingInt({ TagVersion tag -> tag.getMinorVersion() })
+                            .compare(a, b)
                 }
-        if (tags) {
-            return tags.last()
-        } else {
-            return new TagVersion(BigDecimal.ZERO, VersionType.MASTER)
-        }
 
+        return tags ? tags.last() : TagVersion.ZERO_VERSION
     }
 
     @Override
