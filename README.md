@@ -47,9 +47,10 @@ tasks.build{
 ```
 ## Описание задач: 
 Все задачи плагина находятся в группе "**git tagger**"
-1. getLastTagVersion - Возвращает последнюю опубликованную версию
-2. checkUncommitted - Проверяет git status в случае если таких нет возвращает true
+1. getLastTagVersion - Возвращает последнюю опубликованную версию зависит от isGitRepositoryExist(7)
+2. checkUncommitted - Проверяет git status в случае если таких нет возвращает true зависит от isGitRepositoryExist(7)
 3. checkHeadTags - Проверяет наличие тегов у Head если такие есть возвращает true, зависит от checkUncommitted (2)
 4. addTagToHead - Добавляет тег на основе последнего актуального тега и текущей ветки зависит от checkHeadTags (3)
 5. pushHeadToRemote - Обновляет удаленный репозиторий из текущей ветки теги не пушит(мб надо) зависит addTagToHead (4)
-6. buildTagger - Решение задачи в 1 таске
+6. buildTagger - Решение задачи в 1 таске зависит от isGitRepositoryExist(7)
+7. isGitRepositoryExist - Проверяет существует ли Git репозиторий
